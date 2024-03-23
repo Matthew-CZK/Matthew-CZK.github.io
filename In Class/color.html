@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        div#a {
+            background-color: red;
+            border: solid;
+            height: 100px;
+            width: 100px;
+        }
+
+        div.b {
+            /*            hex range is 0-9, a-f*/
+            /*            ff(red),00(green),00(blue)*/
+            background-color: #27ff00;
+            border: solid;
+            height: 100px;
+            width: 100px;
+        }
+
+        div#rgb {
+            /*            255,0,0: red,green,blue*/
+            /*            range: 0-255*/
+            background-color: rgb(25, 229, 255);
+            border: solid;
+            height: 100px;
+            width: 100px;
+        }
+
+        div#rgba {
+            /*            a: alpha*/
+            /*            range of alpha: 0-1*/
+            background-color: rgba(25, 229, 255, 0.51);
+            border: solid;
+            height: 100px;
+            width: 100px;
+        }
+
+        body {
+            /*            url: universal resource location*/
+            background-image: url(https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2);
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="a"></div>
+    <br>
+    <div id="b" class="b"></div>
+    <br>
+    <div id="rgb"></div>
+    <br>
+    <div id="rgba"></div>
+</body></html>
