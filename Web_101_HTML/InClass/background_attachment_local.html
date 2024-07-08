@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    
+  <style>
+    section {
+      border: solid;
+      height: 500px;
+      background-attachment: local;
+      overflow: auto;
+    }
+
+    section:first-child {
+      background-image: url(https://cdn.pixabay.com/photo/2023/12/22/09/46/cotton-top-tamarin-8463471_1280.jpg);
+    }
+
+    section:nth-child(2) {
+      background-image: url(https://cdn.pixabay.com/photo/2023/06/26/13/41/wolf-8089783_1280.jpg);
+    }
+
+    section:last-child {
+      background-image: url(https://cdn.pixabay.com/photo/2014/10/01/10/44/animal-468228_1280.jpg);
+    }
+
+    section>div {
+      border: solid red;
+      width: 0px;
+      height: 1800px;
+      background-color: orange;
+    }
+  </style>
+    
+</head>
+<body>
+    section*3>div
+    <section>
+        <div></div>
+    </section>
+    <section>
+        <div></div>
+    </section>
+    <section>
+        <div></div>
+    </section>
+</body>
+</html>

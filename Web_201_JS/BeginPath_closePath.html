@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #canvas{
+            border: solid green 4px;
+        }
+    </style>
+
+</head>
+<body>
+    <canvas id="canvas" width="400" height="600"></canvas>
+
+    <script>
+/*
+        //javascript auto create objuct from html tag with have id
+        //console.dir(canvas);
+
+        let canvas=document.querySelector('#canvas');
+        let ctx = canvas.getContext('2d');
+
+        //outline
+        //x,y,w,h
+        ctx.fillRect(100,50,200,100);
+        //
+        ctx.rect(100,200,200,100);
+        ctx.fillStyle='red';
+        ctx.fill();
+*/    
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+
+        let paddle = {
+            x: canvas.width/2,
+            y: canvas.height - 20,
+            w: 160,
+            h: 20,
+            draw: function () {
+                ctx.beginPath();
+                ctx.rect(this.x, this.y, this.w, this.h);
+                ctx.fillStyle = 'black';
+                ctx.fill();
+            }
+        }
+
+        paddle.draw();
+
+        let ball = {
+            x: canvas.width/2,
+            y: canvas.height - 15 - paddle.h,
+            r:15,
+            draw: function () {
+                ctx.beginPath();
+                ctx.rect(this.x, this.y, this.w, this.h);
+                ctx.fillStyle = 'blue';
+                ctx.fill();
+            },
+            undate: function(){
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
+            }
+        }
+    </script>
+</body>
+</html>
