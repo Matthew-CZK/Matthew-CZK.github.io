@@ -9,28 +9,50 @@
     canvas {
       border: solid 10px #66ba66;
     }
+
+    #background {
+      position: absolute;
+    }
+
+    #canvas {
+      position: absolute;
+    }
   </style>
 </head>
 
 <body>
-  <canvas id='canvas' width=600 height=600></canvas>
+  <!-- 
+  create variable: level
+  if break all blocks, increase level, and init game for the new level
+  -->
+  <canvas id="background" width="450" height="600"></canvas>
+  <canvas id='canvas' width=450 height=600></canvas>
 
   <script src="debug.js"></script>
   <script>
-    var canvas = document.querySelector('canvas');
+    // draw background
+    var bgCanvas = document.querySelector('#background');
+    var c = bgCanvas.getContext('2d');
+    let bg = new Image();
+    bg.src = "breakout_bg.avif";
+    bg.addEventListener('load', function () {
+      c.drawImage(bg, 0, 0, bgCanvas.width, bgCanvas.height);
+    });
+
+    // draw game
+    var canvas = document.querySelector('#canvas');
     var ctx = canvas.getContext('2d');
 
     // audio
-    let audioBounce=new Audio('./bounce.mp3');
-    audioBounce.addEventListener('loadedmetadata',function() {
+    let audioBounce = new Audio('./bounce.mp3');
+    audioBounce.addEventListener('loadedmetadata', function () {
     });
     function play(audio) {
-      audio.volume=0.1;
-      let a=audio.cloneNode();
-      a.play();
+      // audio.volume = 0.0;
+      // let a = audio.cloneNode();
+      // a.play();
     }
 
-    // 
     // events
     window.addEventListener('keydown', function (e) {
       console.log(e.code);
@@ -45,8 +67,15 @@
       }
       else if (e.code === "ArrowRight") {
         right = true;
-      } else if (e.code === 'Space') {
+      } else if (e.code === 'KeyP') {
         pause = !pause; // toggle the value
+      } else if (e.code === 'Space') {
+        game.start = true;
+        game.isover= false;
+      } else if (e.code === 'KeyS') {
+        game.isover= false;
+        ball.init();
+        paddle.init();
       }
     });
 
@@ -58,6 +87,33 @@
         right = false;
       }
     });
+
+    // 
+    let game = {
+      level: 1,
+      score: 0,
+      // game over
+      isover: false,
+      start: false,
+      gameover: function () {
+        this.isover= true;
+        this.start= false;
+        drawText('Game over! Press "S" to start', canvas.width / 2, canvas.height / 2);
+      },
+      init: function () {
+        /*
+          draw bricks
+          reset ball and paddle
+        */
+        rows++;
+        numOfBricks = rows * cols;
+        blocks = createBlocks(rows, cols);
+        ball.init();
+        paddle.init();
+
+        this.start = false;
+      }
+    }
 
     //
     function collisionOnTop(circle, rect) {
@@ -91,11 +147,13 @@
     }
 
     // write text
-    function drawText(text,x,y,color) {
+    function drawText(text, x, y, color) {
       ctx.beginPath();
-      ctx.font="20px monospace";
-      ctx.fillStyle=color;
-      ctx.fillText(text,x,y);
+      ctx.textAlign = 'center';
+      ctx.textBaseLine = 'middle';
+      ctx.font = "20px monospace";
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
     }
 
     // block
@@ -111,6 +169,11 @@
         if (!this.exist) return;
         ctx.beginPath();
         ctx.rect(this.x, this.y, this.w, this.h);
+        let g = ctx.createLinearGradient(this.x, this.y, this.x + this.w, this.y + this.h);
+        g.addColorStop(0, 'orange');
+        g.addColorStop(1, 'red');
+
+        ctx.fillStyle = g;
         ctx.fill();
       },
       update: function () {
@@ -140,8 +203,11 @@
       return blocks;
     }
 
-    let rows = 3;
-    let cols = 5;
+
+    let rows = 1;
+    let cols = 3;
+    let numOfBricks = rows * cols;
+
     let blocks = createBlocks(rows, cols);
     console.log(blocks);
 
@@ -152,6 +218,10 @@
       w: 160,
       h: 20,
       dx: 5,
+      init: function () {
+        this.x = canvas.width / 2 - this.w / 2;
+        this.y = canvas.height - this.h;
+      },
       draw: function () {
         ctx.beginPath();
         ctx.rect(this.x, this.y, this.w, this.h);
@@ -162,11 +232,17 @@
         if (left) {
           if (this.x - this.dx >= 0) {
             this.x -= this.dx;
+            if (!game.start) {
+              ball.x -= this.dx;
+            }
           }
         }
         if (right) {
           if (this.x + this.w + this.dx <= canvas.width) {
             this.x += this.dx;
+            if (!game.start) {
+              ball.x += this.dx;
+            }
           }
         }
       }
@@ -174,41 +250,55 @@
 
     paddle.draw();
 
-//game over
-let gameoverFlag=false;
-function gameover()｛
-gameoverFlag=true;
-drawText('Game over! Press "s" to start', canvas.width/2,canvas.height/2);
-
 
     // ball
     let maxAngle = 160;
     let minAngle = 20;
 
+    // 
     let ball = {
       x: canvas.width / 2,
-      y: canvas.height - paddle.h - 15,
-      dx: 2, // delta x
-      dy: -3,
+      y: canvas.height - paddle.h - 15 - 2,
+      dx: 0, // delta x
+      dy: -8,
       r: 15,
+      init: function () {
+        this.x = canvas.width / 2;
+        this.y = canvas.height - paddle.h - this.r - 2;
+        this.dx = 0;
+        this.dy = -5;
+      },
       draw: function () {
         ctx.beginPath();
+        // ctx.fillStyle = 'blue';
+        //
+        let g = ctx.createRadialGradient(this.x - 5, this.y - 5, this.r / 8, this.x - 5, this.y - 5, this.r);
+        g.addColorStop(0, 'white');
+        g.addColorStop(1, 'black');
+        ctx.fillStyle = g;
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'blue';
         ctx.fill();
       },
       update: function () {
+        if (!game.start) return;
         // ball hit blocks
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
-            if (blocks[r][c].exist && (collisionOnTop(this, blocks[r][c])
-              || collisionOnLeft(this, blocks[r][c])
-              || collisionOnRight(this, blocks[r][c])
-              || collisionOnBottom(this, blocks[r][c]))) {
-                blocks[r][c].exist=false;
-                this.dy*=-1;
-                //
-                play(audioBounce);
+            if (blocks[ r ][ c ].exist && (collisionOnTop(this, blocks[ r ][ c ])
+              || collisionOnLeft(this, blocks[ r ][ c ])
+              || collisionOnRight(this, blocks[ r ][ c ])
+            )) {
+              blocks[ r ][ c ].exist = false;
+              this.dy *= -1;
+              game.score += 1;
+              //
+              numOfBricks--;
+              if (numOfBricks == 0) {
+                game.level++;
+                game.init();
+              }
+              //
+              play(audioBounce);
             }
           }
         }
@@ -236,9 +326,15 @@ drawText('Game over! Press "s" to start', canvas.width/2,canvas.height/2);
           play(audioBounce);
         }
         // ball hit top or bottom of canvas
-        if (this.y - this.r <= 0 || this.y + this.r >= canvas.height) {
+        if (this.y - this.r <= 0
+          // || this.y + this.r >= canvas.height
+        ) {
           this.dy *= -1;
           play(audioBounce);
+        }
+
+        if (this.y + this.r >= canvas.height) {
+          game.gameover();
         }
         this.x += this.dx;
         this.y += this.dy;
@@ -249,16 +345,18 @@ drawText('Game over! Press "s" to start', canvas.width/2,canvas.height/2);
     ball.draw();
 
     let pause = false;
-    let score = 0;
+
     // game loop
     function loop() {
       requestAnimationFrame(loop);
       if (pause) return;
+      if (game.isover) return;
       // 1 clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // 2 draw
-      drawText("Score: "+score, 10,20,'blue');
+      drawText("Score: " + game.score, 60, 20, 'blue');
+      drawText("Level: " + game.level, 200, 20, 'blue');
       blocks.forEach(function (row) {
         row.forEach(function (block) {
           block.draw();
